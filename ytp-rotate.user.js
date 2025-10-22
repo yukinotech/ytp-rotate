@@ -2,7 +2,7 @@
 // @author          zhzLuke96
 // @name            油管视频旋转
 // @name:en         youtube player rotate
-// @version         2.10
+// @version         2.11
 // @description     油管的视频旋转插件.
 // @description:en  rotate youtube player.
 // @namespace       https://github.com/zhzLuke96/ytp-rotate
@@ -738,6 +738,7 @@
       transform: [],
     };
     $style = document.createElement("style");
+    base_transform = "";
 
     constructor() {
       this.enable();
@@ -760,6 +761,13 @@
       if (!($player instanceof HTMLElement)) {
         throw new Error("$player must be a HTMLElement");
       }
+      const computed_style = window.getComputedStyle($video);
+      const inline_transform = this.sanitize_transform($video.style.transform);
+      const computed_transform = this.sanitize_transform(
+        computed_style?.transform
+      );
+      this.base_transform = inline_transform || computed_transform || "";
+
       this.$video = $video;
       this.$player = $player;
 
@@ -830,8 +838,16 @@
       }
 
       const scaleK = this.calcScaleK();
+      const inline_transform = this.sanitize_transform(
+        this.$video?.style.transform
+      );
+      if (inline_transform) {
+        this.base_transform = inline_transform;
+      }
+      const base_transform = this.base_transform;
 
       const transform_arr = [
+        base_transform,
         `rotate(${this.status.rotate * 90}deg)`,
         `scale(${scaleK})`,
       ];
@@ -844,9 +860,30 @@
         if (this.status.rotate % 2 == 1) append_transform("rotateY(180deg)");
         else append_transform("rotateX(180deg)");
       }
-      this.styles.transform = transform_arr;
+      this.styles.transform = transform_arr.filter((text) =>
+        Boolean(text?.trim())
+      );
 
       this.updateRule();
+    }
+
+    sanitize_transform(transform) {
+      if (!transform) {
+        return "";
+      }
+      const sanitized = transform.replace(/\s*!important\s*/g, "").trim();
+      if (!sanitized || sanitized === "none") {
+        return "";
+      }
+      const normalized = sanitized.replace(/\s+/g, "");
+      const identity_matrices = [
+        "matrix(1,0,0,1,0,0)",
+        "matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)",
+      ];
+      if (identity_matrices.includes(normalized)) {
+        return "";
+      }
+      return sanitized;
     }
 
     enabled = true;

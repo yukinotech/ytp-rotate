@@ -1,6 +1,9 @@
 
 ## Change Log
 
+### [2.11] - 2025-10-22
+- preserve YouTube's native transforms when applying rotation to fix distorted fullscreen playback
+
 ### [2.9] - 2024-10-16
 - fix youtube html policy change
 
