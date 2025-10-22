@@ -1,6 +1,9 @@
 
 ## Change Log
 
+### [2.12] - 2025-10-23
+- apply native video transforms before custom rotations so fullscreen landscape videos rotate correctly
+
 ### [2.11] - 2025-10-22
 - preserve YouTube's native transforms when applying rotation to fix distorted fullscreen playback
 

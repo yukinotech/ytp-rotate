@@ -2,7 +2,7 @@
 // @author          zhzLuke96
 // @name            油管视频旋转
 // @name:en         youtube player rotate
-// @version         2.11
+// @version         2.12
 // @description     油管的视频旋转插件.
 // @description:en  rotate youtube player.
 // @namespace       https://github.com/zhzLuke96/ytp-rotate
@@ -844,10 +844,7 @@
       if (inline_transform) {
         this.base_transform = inline_transform;
       }
-      const base_transform = this.base_transform;
-
       const transform_arr = [
-        base_transform,
         `rotate(${this.status.rotate * 90}deg)`,
         `scale(${scaleK})`,
       ];
@@ -859,6 +856,10 @@
       if (this.status.vertical) {
         if (this.status.rotate % 2 == 1) append_transform("rotateY(180deg)");
         else append_transform("rotateX(180deg)");
+      }
+      const base_transform = this.base_transform;
+      if (base_transform) {
+        transform_arr.push(base_transform);
       }
       this.styles.transform = transform_arr.filter((text) =>
         Boolean(text?.trim())
