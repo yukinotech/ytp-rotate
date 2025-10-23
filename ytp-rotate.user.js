@@ -2,7 +2,7 @@
 // @author          zhzLuke96
 // @name            油管视频旋转
 // @name:en         youtube player rotate
-// @version         2.12
+// @version         2.13
 // @description     油管的视频旋转插件.
 // @description:en  rotate youtube player.
 // @namespace       https://github.com/zhzLuke96/ytp-rotate
@@ -831,6 +831,8 @@
       if (!$player || !$video) {
         throw new Error("can't find player or video element");
       }
+      this.base_transform = this.capture_base_transform();
+
       if (this.isNoneEffect()) {
         // 清空副作用
         this.updateRule("");
@@ -838,12 +840,6 @@
       }
 
       const scaleK = this.calcScaleK();
-      const inline_transform = this.sanitize_transform(
-        this.$video?.style.transform
-      );
-      if (inline_transform) {
-        this.base_transform = inline_transform;
-      }
       const transform_arr = [
         `rotate(${this.status.rotate * 90}deg)`,
         `scale(${scaleK})`,
@@ -866,6 +862,42 @@
       );
 
       this.updateRule();
+    }
+
+    capture_base_transform() {
+      const { $video, $style } = this;
+      if (!$video) {
+        return "";
+      }
+
+      const inline_transform = this.sanitize_transform($video.style.transform);
+      if (inline_transform) {
+        return inline_transform;
+      }
+
+      if (!$style?.isConnected) {
+        return this.sanitize_transform(
+          window.getComputedStyle($video).transform
+        );
+      }
+
+      const was_disabled = $style.disabled === true;
+      let computed_transform = "";
+      try {
+        $style.disabled = true;
+        computed_transform = this.sanitize_transform(
+          window.getComputedStyle($video).transform
+        );
+      } catch (error) {
+        console.error(
+          "[ytp-rotate] failed to capture native video transform",
+          error
+        );
+      } finally {
+        $style.disabled = was_disabled;
+      }
+
+      return computed_transform;
     }
 
     sanitize_transform(transform) {

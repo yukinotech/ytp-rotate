@@ -1,6 +1,9 @@
 
 ## Change Log
 
+### [2.13] - 2025-10-23
+- refresh the native video transform before applying rotations so fullscreen landscape videos turn correctly instead of squashing
+
 ### [2.12] - 2025-10-23
 - apply native video transforms before custom rotations so fullscreen landscape videos rotate correctly
 
